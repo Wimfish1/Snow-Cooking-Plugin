@@ -41,7 +41,7 @@ namespace Ocelot.SnowCooking.functions
                                     break;
                                 if (Generator.fuel > 0 && Generator.isPowered && Generator.wirerange >= (heater.Key.position - Generator.transform.position).magnitude)
                                 {
-                                    if (item.Key == null || item.Value == null || heater.Key == null)
+                                    if (item.Key == null || heater.Key == null)
                                         break;
                                     if (heater.Key.position == item.Value)
                                     {
@@ -55,8 +55,7 @@ namespace Ocelot.SnowCooking.functions
                                         {
                                             heater.Value.isActive = true;
                                         }
-                                        if (uplayer == null)
-                                            break;
+
                                         EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), uplayer.CSteamID, false, "cocaineplugin.toggletext", status);
                                     }
                                 }

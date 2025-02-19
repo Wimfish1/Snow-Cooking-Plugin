@@ -104,6 +104,7 @@ namespace Ocelot.SnowCooking.functions
         //        }
         //    }
         //}
+        // ReSharper disable Unity.PerformanceAnalysis
         public static void Update()
         {
             double heatProg = SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / SnowCookingPlugin.Instance.Configuration.Instance.heatingDurationSecs;
@@ -114,12 +115,12 @@ namespace Ocelot.SnowCooking.functions
             {
                 foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
                 {
-                    if (heater.Key == null || heater.Value == null)
+                    if (!heater.Key || heater.Value == null)
                         break;
                     int amountActiveGenerators = 0;
                     foreach (var Generator in PowerTool.checkGenerators(heater.Key.position, PowerTool.MAX_POWER_RANGE, ushort.MaxValue).ToList())
                     {
-                        if (heater.Key == null || Generator.transform == null)
+                        if (!heater.Key || !Generator.transform)
                             break;
 
                         /* old generator logic
@@ -142,8 +143,6 @@ namespace Ocelot.SnowCooking.functions
                             heater.Value.isActive = false;
                             foreach (var player in SnowCookingPlugin.Instance.heaterUiOpened.ToList())
                             {
-                                if (heater.Key.position == null || player.Value == null)
-                                    break;
                                 if (player.Value == heater.Key.position)
                                 {
                                     EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), new CSteamID(ulong.Parse(player.Key)), false, "cocaineplugin.toggletext", "<color=red>OFF</color>");
@@ -155,7 +154,7 @@ namespace Ocelot.SnowCooking.functions
                 }
             } catch (Exception ex)
             {
-                Logger.Log(String.Format("EXCEPTION THROWN | ExNo 1 (Error message: {0})", ex.Message), ConsoleColor.Red);
+                Logger.Log($"EXCEPTION THROWN | ExNo 1 (Error message: {ex.Message})", ConsoleColor.Red);
                 return;
             }
 
@@ -163,7 +162,7 @@ namespace Ocelot.SnowCooking.functions
             {
                 foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
                 {
-                    if (heater.Key == null || heater.Value == null)
+                    if (!heater.Key || heater.Value == null)
                         break;
                     if (heater.Value.isActive)
                     {
@@ -186,7 +185,7 @@ namespace Ocelot.SnowCooking.functions
                 }
             } catch (Exception ex)
             {
-                Logger.Log(String.Format("EXCEPTION THROWN | ExNo 2 (Error message: {0})", ex.Message), ConsoleColor.Red);
+                Logger.Log($"EXCEPTION THROWN | ExNo 2 (Error message: {ex.Message})", ConsoleColor.Red);
                 return;
             }
 
@@ -194,7 +193,7 @@ namespace Ocelot.SnowCooking.functions
             {
                 foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
                 {
-                    if (heater.Key == null || heater.Value == null)
+                    if (!heater.Key || heater.Value == null)
                         break;
                     if (heater.Value.progress < 0 || heater.Value.progress > SnowCookingPlugin.Instance.Configuration.Instance.maxDegree)
                     {
@@ -238,7 +237,7 @@ namespace Ocelot.SnowCooking.functions
                     {
                         foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
                         {
-                            if (heater.Key == null || item.Value == null)
+                            if (heater.Key == null)
                                 break;
                             if (item.Value == heater.Key.position)
                             {
@@ -277,7 +276,7 @@ namespace Ocelot.SnowCooking.functions
                     }
                 }
             } catch(Exception ex) {
-                Logger.Log(String.Format("EXCEPTION THROWN | ExNo 4 (Error message: {0})", ex.Message), ConsoleColor.Red);
+                Logger.Log($"EXCEPTION THROWN | ExNo 4 (Error message: {ex.Message})", ConsoleColor.Red);
                 return;
             }
         }

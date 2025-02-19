@@ -10,21 +10,21 @@ namespace Ocelot.SnowCooking.functions
         {
             foreach (var panFilled in SnowCookingPlugin.Instance.panFilledList.ToList())
             {
-                if (panFilled.Key == null)
+                if (!panFilled.Key)
                     break;
                 if (Physics.Raycast(panFilled.Key.position, Vector3.up, out RaycastHit raycastHit, 14, RayMasks.BARRICADE))
                 {
                     foreach (var lamp in SnowCookingPlugin.Instance.dryingLampList.ToList())
                     {
-                        if (lamp == null)
+                        if (!lamp)
                             break;
-                        foreach (var Generator in PowerTool.checkGenerators(lamp.position, PowerTool.MAX_POWER_RANGE, ushort.MaxValue))
+                        foreach (var generator in PowerTool.checkGenerators(lamp.position, PowerTool.MAX_POWER_RANGE, ushort.MaxValue))
                         {
-                            if (Generator == null || lamp == null)
+                            if (!generator || !lamp)
                                 break;
-                            if (Generator.isPowered && Generator.wirerange >= (lamp.position - Generator.transform.position).magnitude)
+                            if (generator.isPowered && generator.wirerange >= (lamp.position - generator.transform.position).magnitude)
                             {
-                                if (lamp == null || raycastHit.transform == null)
+                                if (!lamp || !raycastHit.transform)
                                     break;
                                 if (lamp == raycastHit.transform)
                                 {
@@ -33,14 +33,14 @@ namespace Ocelot.SnowCooking.functions
                                     if (panFilled.Value.progress >= 100)
                                     {
                                         BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panPowderId), null, panFilled.Key.position, panFilled.Value.angle_x, panFilled.Value.angle_y, panFilled.Value.angle_z, panFilled.Value.owner, panFilled.Value.group);
-                                        if (panFilled.Key == null)
+                                        if (!panFilled.Key)
                                             break;
                                         BarricadeManager.tryGetInfo(panFilled.Key, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
                                         if (index >= 0 && index < region.barricades.Count)
                                         {
                                             BarricadeManager.destroyBarricade(region, x, y, plant, index);
                                         }
-                                        if (panFilled.Key == null)
+                                        if (!panFilled.Key)
                                             break;
                                         SnowCookingPlugin.Instance.panFilledList.Remove(panFilled.Key);
                                     }

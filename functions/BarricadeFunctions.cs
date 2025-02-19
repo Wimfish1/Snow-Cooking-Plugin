@@ -61,51 +61,49 @@ namespace Ocelot.SnowCooking.functions
             if (barricadeTransform)
             {
                 BarricadeData bData = SnowCookingPlugin.Instance.getBarricadeDataAtPosition(barricadeTransform.position);
-                if (bData != null)
+                if (bData == null) return;
+                if (bData.barricade.health <= pendingTotalDamage)
                 {
-                    if (bData.barricade.health <= pendingTotalDamage)
+                    if (SnowCookingPlugin.Instance.Configuration.Instance.heaterIds.Contains(bData.barricade.id))
                     {
-                        if (SnowCookingPlugin.Instance.Configuration.Instance.heaterIds.Contains(bData.barricade.id))
+                        if (SnowCookingPlugin.Instance.heaterList.ContainsKey(barricadeTransform))
                         {
-                            if (SnowCookingPlugin.Instance.heaterList.ContainsKey(barricadeTransform))
-                            {
-                                SnowCookingPlugin.Instance.heaterList.Remove(barricadeTransform);
-                            }
-                        } 
-                        else if (SnowCookingPlugin.Instance.Configuration.Instance.dryingLampId == bData.barricade.id)
-                        {
-                            if (SnowCookingPlugin.Instance.dryingLampList.Contains(barricadeTransform))
-                            {
-                                SnowCookingPlugin.Instance.dryingLampList.Remove(barricadeTransform);
-                            }
+                            SnowCookingPlugin.Instance.heaterList.Remove(barricadeTransform);
                         }
-                        else if (SnowCookingPlugin.Instance.Configuration.Instance.panId == bData.barricade.id)
+                    } 
+                    else if (SnowCookingPlugin.Instance.Configuration.Instance.dryingLampId == bData.barricade.id)
+                    {
+                        if (SnowCookingPlugin.Instance.dryingLampList.Contains(barricadeTransform))
                         {
-                            if (SnowCookingPlugin.Instance.panList.ContainsKey(barricadeTransform))
-                            {
-                                SnowCookingPlugin.Instance.panList.Remove(barricadeTransform);
-                            }
+                            SnowCookingPlugin.Instance.dryingLampList.Remove(barricadeTransform);
                         }
-                        else if (SnowCookingPlugin.Instance.Configuration.Instance.panFilledId == bData.barricade.id)
+                    }
+                    else if (SnowCookingPlugin.Instance.Configuration.Instance.panId == bData.barricade.id)
+                    {
+                        if (SnowCookingPlugin.Instance.panList.ContainsKey(barricadeTransform))
                         {
-                            if (SnowCookingPlugin.Instance.panFilledList.ContainsKey(barricadeTransform))
-                            {
-                                SnowCookingPlugin.Instance.panFilledList.Remove(barricadeTransform);
-                            }
+                            SnowCookingPlugin.Instance.panList.Remove(barricadeTransform);
                         }
-                        else if (SnowCookingPlugin.Instance.Configuration.Instance.panPowderId == bData.barricade.id)
+                    }
+                    else if (SnowCookingPlugin.Instance.Configuration.Instance.panFilledId == bData.barricade.id)
+                    {
+                        if (SnowCookingPlugin.Instance.panFilledList.ContainsKey(barricadeTransform))
                         {
-                            if (SnowCookingPlugin.Instance.panPowderList.ContainsKey(barricadeTransform))
-                            {
-                                SnowCookingPlugin.Instance.panPowderList.Remove(barricadeTransform);
-                            }
+                            SnowCookingPlugin.Instance.panFilledList.Remove(barricadeTransform);
                         }
-                        else if (SnowCookingPlugin.Instance.Configuration.Instance.cocaLeavesId == bData.barricade.id)
+                    }
+                    else if (SnowCookingPlugin.Instance.Configuration.Instance.panPowderId == bData.barricade.id)
+                    {
+                        if (SnowCookingPlugin.Instance.panPowderList.ContainsKey(barricadeTransform))
                         {
-                            if (SnowCookingPlugin.Instance.cocaLeavesList.Contains(barricadeTransform))
-                            {
-                                SnowCookingPlugin.Instance.cocaLeavesList.Remove(barricadeTransform);
-                            }
+                            SnowCookingPlugin.Instance.panPowderList.Remove(barricadeTransform);
+                        }
+                    }
+                    else if (SnowCookingPlugin.Instance.Configuration.Instance.cocaLeavesId == bData.barricade.id)
+                    {
+                        if (SnowCookingPlugin.Instance.cocaLeavesList.Contains(barricadeTransform))
+                        {
+                            SnowCookingPlugin.Instance.cocaLeavesList.Remove(barricadeTransform);
                         }
                     }
                 }
@@ -123,113 +121,113 @@ namespace Ocelot.SnowCooking.functions
                 return;
 
             if (SnowCookingPlugin.Instance.Configuration.Instance.heaterIds.Contains(bDrop.asset.id))
+            {
+                foreach (var item in SnowCookingPlugin.Instance.heaterList.ToList())
                 {
-                    foreach (var item in SnowCookingPlugin.Instance.heaterList.ToList())
-                    {
-                        if (item.Key == null)
-                            break;
+                    if (item.Key == null)
+                        break;
 
-                        if (item.Key.position == bDrop.model.position)
-                        {
-                            BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
-                            if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
-                            {
-                                if (bDrop.model != null)
-                                    SnowCookingPlugin.Instance.heaterList.Remove(bDrop.model);
-                            }
-                        }
-                    }
-                } else
-                if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.panId)
-                {
-                    foreach (var item in SnowCookingPlugin.Instance.panList.ToList())
+                    if (item.Key.position == bDrop.model.position)
                     {
-                        if (item.Key == null)
-                            break;
-
-                        if (item.Key.position == bDrop.model.position)
+                        BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                        if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
                         {
-                            BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
-                            if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
-                            {
-                                if (bDrop.model != null)
-                                    SnowCookingPlugin.Instance.panList.Remove(bDrop.model);
-                            }
-                        }
-                    }
-                } else
-                if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.panFilledId)
-                {
-                    foreach (var item in SnowCookingPlugin.Instance.panFilledList.ToList())
-                    {
-                        if (item.Key == null)
-                            break;
-
-                        if (item.Key.position == bDrop.model.position)
-                        {
-                            BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
-                            if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
-                            {
-                                if (bDrop.model != null)
-                                    SnowCookingPlugin.Instance.panFilledList.Remove(bDrop.model);
-                            }
-                        }
-                    }
-                } else
-                if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.panPowderId)
-                {
-                    foreach (var item in SnowCookingPlugin.Instance.panPowderList.ToList())
-                    {
-                        if (item.Key == null)
-                            break;
-
-                        if (item.Key.position == bDrop.model.position)
-                        {
-                            BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
-                            if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
-                            {
-                                if (bDrop.model != null)
-                                    SnowCookingPlugin.Instance.panPowderList.Remove(bDrop.model);
-                            }
-                        }
-                    }
-                } else
-                if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.cocaLeavesId)
-                {
-                    foreach (var item in SnowCookingPlugin.Instance.cocaLeavesList.ToList())
-                    {
-                        if (item == null)
-                            break;
-
-                        if (item.position == bDrop.model.position)
-                        {
-                            BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
-                            if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
-                            {
-                                if (bDrop.model != null)
-                                    SnowCookingPlugin.Instance.cocaLeavesList.Remove(bDrop.model);
-                            }
-                        }
-                    }
-                } else
-                if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.dryingLampId)
-                {
-                    foreach (var item in SnowCookingPlugin.Instance.dryingLampList.ToList())
-                    {
-                        if (item == null)
-                            break;
-
-                        if (item.position == bDrop.model.position)
-                        {
-                            BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
-                            if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
-                            {
-                                if (bDrop.model != null)
-                                    SnowCookingPlugin.Instance.dryingLampList.Remove(bDrop.model);
-                            }
+                            if (bDrop.model != null)
+                                SnowCookingPlugin.Instance.heaterList.Remove(bDrop.model);
                         }
                     }
                 }
+            } else
+            if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.panId)
+            {
+                foreach (var item in SnowCookingPlugin.Instance.panList.ToList())
+                {
+                    if (item.Key == null)
+                        break;
+
+                    if (item.Key.position == bDrop.model.position)
+                    {
+                        BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                        if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
+                        {
+                            if (bDrop.model != null)
+                                SnowCookingPlugin.Instance.panList.Remove(bDrop.model);
+                        }
+                    }
+                }
+            } else
+            if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.panFilledId)
+            {
+                foreach (var item in SnowCookingPlugin.Instance.panFilledList.ToList())
+                {
+                    if (item.Key == null)
+                        break;
+
+                    if (item.Key.position == bDrop.model.position)
+                    {
+                        BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                        if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
+                        {
+                            if (bDrop.model != null)
+                                SnowCookingPlugin.Instance.panFilledList.Remove(bDrop.model);
+                        }
+                    }
+                }
+            } else
+            if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.panPowderId)
+            {
+                foreach (var item in SnowCookingPlugin.Instance.panPowderList.ToList())
+                {
+                    if (item.Key == null)
+                        break;
+
+                    if (item.Key.position == bDrop.model.position)
+                    {
+                        BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                        if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
+                        {
+                            if (bDrop.model != null)
+                                SnowCookingPlugin.Instance.panPowderList.Remove(bDrop.model);
+                        }
+                    }
+                }
+            } else
+            if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.cocaLeavesId)
+            {
+                foreach (var item in SnowCookingPlugin.Instance.cocaLeavesList.ToList())
+                {
+                    if (item == null)
+                        break;
+
+                    if (item.position == bDrop.model.position)
+                    {
+                        BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                        if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
+                        {
+                            if (bDrop.model != null)
+                                SnowCookingPlugin.Instance.cocaLeavesList.Remove(bDrop.model);
+                        }
+                    }
+                }
+            } else
+            if (bDrop.asset.id == SnowCookingPlugin.Instance.Configuration.Instance.dryingLampId)
+            {
+                foreach (var item in SnowCookingPlugin.Instance.dryingLampList.ToList())
+                {
+                    if (item == null)
+                        break;
+
+                    if (item.position == bDrop.model.position)
+                    {
+                        BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                        if (x == xBarricade && y == yBarricade && plant == plantBarricade && index == indexBarricade)
+                        {
+                            if (bDrop.model != null)
+                                SnowCookingPlugin.Instance.dryingLampList.Remove(bDrop.model);
+                        }
+                    }
+                }
+            }
         }
         public static void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, Vector3 pos, float angle_x, float angle_y, float angle_z, ulong owner, ulong group)
         {
@@ -240,7 +238,7 @@ namespace Ocelot.SnowCooking.functions
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
                     Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
-                    if (barricadeTransform == null) return;
+                    if (!barricadeTransform) return;
                     try
                     {
                         if (!SnowCookingPlugin.Instance.heaterList.ContainsKey(barricadeTransform))
@@ -259,7 +257,7 @@ namespace Ocelot.SnowCooking.functions
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
                     Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
-                    if (barricadeTransform == null) return;
+                    if (!barricadeTransform) return;
                     try
                     {
                         if (!SnowCookingPlugin.Instance.panList.ContainsKey(barricadeTransform))
@@ -278,7 +276,7 @@ namespace Ocelot.SnowCooking.functions
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
                     Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
-                    if (barricadeTransform == null) return;
+                    if (!barricadeTransform) return;
                     try
                     {
                         if (!SnowCookingPlugin.Instance.cocaLeavesList.Contains(barricadeTransform))
@@ -300,7 +298,7 @@ namespace Ocelot.SnowCooking.functions
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
                     Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
-                    if (barricadeTransform == null) return;
+                    if (!barricadeTransform) return;
                     try
                     {
                         if (!SnowCookingPlugin.Instance.panFilledList.ContainsKey(barricadeTransform))
@@ -321,7 +319,7 @@ namespace Ocelot.SnowCooking.functions
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
                     Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
-                    if (barricadeTransform == null) return;
+                    if (!barricadeTransform) return;
                     try
                     {
                         if (!SnowCookingPlugin.Instance.dryingLampList.Contains(barricadeTransform))
@@ -342,7 +340,7 @@ namespace Ocelot.SnowCooking.functions
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
                     Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
-                    if (barricadeTransform == null) return;
+                    if (!barricadeTransform) return;
                     try
                     {
                         if (!SnowCookingPlugin.Instance.panPowderList.ContainsKey(barricadeTransform))

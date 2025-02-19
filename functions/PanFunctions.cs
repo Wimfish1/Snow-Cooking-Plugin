@@ -15,10 +15,10 @@ namespace Ocelot.SnowCooking.functions
                 {
                     if (raycastHit.transform == panPowder.Key)
                     {
-                        int amountBags = UnityEngine.Random.Range(SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMin, SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMax);
+                        int amountBags = Random.Range(SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMin, SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMax);
                         for (int i = 0; i < amountBags; i++)
                         {
-                            if (SnowCookingPlugin.Instance.Configuration.Instance.AddItemsDirectlyToInventory == true)
+                            if (SnowCookingPlugin.Instance.Configuration.Instance.AddItemsDirectlyToInventory)
                             {
                                 var item = new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, EItemOrigin.ADMIN);
                                 if (!player.Inventory.tryAddItemAuto(item, true, true, true, false))
@@ -66,32 +66,32 @@ namespace Ocelot.SnowCooking.functions
         {
             foreach (var pan in SnowCookingPlugin.Instance.panList.ToList())
             {
-                if (pan.Key == null)
+                if (!pan.Key)
                     break;
                 if (Physics.Raycast(pan.Key.position, Vector3.down, out RaycastHit raycastHit, 14, RayMasks.BARRICADE))
                 {
-                    if (pan.Key == null)
+                    if (!pan.Key)
                         break;
                     foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
                     {
-                        if (heater.Key == null)
+                        if (!heater.Key)
                             return;
                         if (raycastHit.transform == heater.Key)
                         {
                             double temp = (SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress;
                             if (temp >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
                             {
-                                if (pan.Key == null)
+                                if (!pan.Key)
                                     break;
                                 if (pan.Value.progress <= 100)
                                 {
                                     foreach (var cocaLeaves in SnowCookingPlugin.Instance.cocaLeavesList.ToList())
                                     {
-                                        if (cocaLeaves == null)
+                                        if (!cocaLeaves)
                                             break;
                                         if (Physics.Raycast(cocaLeaves.position, Vector3.down, out RaycastHit raycastHitLeaves, 14, RayMasks.BARRICADE))
                                         {
-                                            if (cocaLeaves == null || pan.Key == null)
+                                            if (!cocaLeaves || !pan.Key)
                                                 break;
                                             if (raycastHitLeaves.transform == pan.Key)
                                             {
@@ -99,14 +99,14 @@ namespace Ocelot.SnowCooking.functions
                                                 pan.Value.progress += progressAdded;
                                                 if (temp >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
                                                 {
-                                                    if (cocaLeaves == null)
+                                                    if (!cocaLeaves)
                                                         break;
                                                     Transform ashes = BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.ashesId), null, cocaLeaves.position, 0, 0, 0, pan.Value.owner, pan.Value.group);
 
                                                     BarricadeManager.tryGetInfo(cocaLeaves, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
                                                     BarricadeManager.destroyBarricade(region, x, y, plant, index);
                                                     SnowCookingPlugin.Instance.cocaLeavesList.Remove(cocaLeaves);
-                                                    if (ashes == null)
+                                                    if (!ashes)
                                                         break;
                                                     EffectManager.sendEffect(SnowCookingPlugin.Instance.Configuration.Instance.cocaLeavesBurnedEffectId, 2, ashes.position);
                                                     return;
@@ -114,21 +114,21 @@ namespace Ocelot.SnowCooking.functions
                                                 if (pan.Value.progress >= 100)
                                                 {
                                                     //coca leaves stuff
-                                                    if (cocaLeaves == null)
+                                                    if (!cocaLeaves)
                                                         break;
                                                     BarricadeManager.tryGetInfo(cocaLeaves, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
                                                     BarricadeManager.destroyBarricade(region, x, y, plant, index);
-                                                    if (cocaLeaves == null)
+                                                    if (!cocaLeaves)
                                                         break;
                                                     SnowCookingPlugin.Instance.cocaLeavesList.Remove(cocaLeaves);
 
                                                     //pan stuff
-                                                    if (pan.Key == null)
+                                                    if (!pan.Key)
                                                         break;
                                                     BarricadeManager.tryGetInfo(pan.Key, out byte xpan, out byte ypan, out ushort plantpan, out ushort indexpan, out BarricadeRegion regionpan);
                                                     BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panFilledId), null, pan.Key.position, pan.Value.angle_x, pan.Value.angle_y, pan.Value.angle_z, pan.Value.owner, pan.Value.group);
                                                     BarricadeManager.destroyBarricade(regionpan, xpan, ypan, plantpan, indexpan);
-                                                    if (pan.Key == null)
+                                                    if (!pan.Key)
                                                         break;
                                                     SnowCookingPlugin.Instance.panList.Remove(pan.Key);
                                                 }
