@@ -18,8 +18,15 @@ namespace Ocelot.SnowCooking.functions
                         int amountBags = UnityEngine.Random.Range(SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMin, SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMax);
                         for (int i = 0; i < amountBags; i++)
                         {
-                            var item = new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, EItemOrigin.ADMIN);
-                            if (!player.Inventory.tryAddItemAuto(item, true, true, true, false))
+                            if (SnowCookingPlugin.Instance.Configuration.Instance.AddItemsDirectlyToInventory == true)
+                            {
+                                var item = new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, EItemOrigin.ADMIN);
+                                if (!player.Inventory.tryAddItemAuto(item, true, true, true, false))
+                                {
+                                    ItemManager.dropItem(new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, true), new Vector3(panPowder.Key.position.x, panPowder.Key.position.y + 2, panPowder.Key.position.z), false, true, false);
+                                }
+                            }
+                            else
                             {
                                 ItemManager.dropItem(new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, true), new Vector3(panPowder.Key.position.x, panPowder.Key.position.y + 2, panPowder.Key.position.z), false, true, false);
                             }

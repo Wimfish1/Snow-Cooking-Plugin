@@ -38,6 +38,7 @@ namespace Ocelot.SnowCooking
         public int DrugEffectDurationSecs;
 
         public ushort cocaLeavesBurnedEffectId;
+        public bool AddItemsDirectlyToInventory;
 
         [XmlArrayItem(ElementName = "heaterId")]
         public List<ushort> heaterIds;
@@ -73,6 +74,7 @@ namespace Ocelot.SnowCooking
             cocaLeavesBurnedEffectId = 119;
             heaterIds = new List<ushort>() { 10205 };
             heaterUiId = 10110;
+            AddItemsDirectlyToInventory = true;
         }
     }
 }
