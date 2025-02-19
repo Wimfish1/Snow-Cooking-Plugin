@@ -1,25 +1,7 @@
-﻿using JetBrains.Annotations;
-using Rocket.API;
-using Rocket.API.Collections;
-using Rocket.Core;
-using Rocket.Core.Plugins;
-using Rocket.Unturned;
-using Rocket.Unturned.Chat;
-using Rocket.Unturned.Enumerations;
-using Rocket.Unturned.Events;
-using Rocket.Unturned.Player;
+﻿using Rocket.Unturned.Player;
 using SDG.Unturned;
-using Steamworks;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Threading;
 using UnityEngine;
-using Logger = Rocket.Core.Logging.Logger;
 
 namespace Ocelot.SnowCooking.functions
 {
@@ -36,7 +18,11 @@ namespace Ocelot.SnowCooking.functions
                         int amountBags = UnityEngine.Random.Range(SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMin, SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMax);
                         for (int i = 0; i < amountBags; i++)
                         {
-                            ItemManager.dropItem(new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, true), new Vector3(panPowder.Key.position.x, panPowder.Key.position.y + 2, panPowder.Key.position.z), false, true, false);
+                            var item = new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, EItemOrigin.ADMIN);
+                            if (!player.Inventory.tryAddItemAuto(item, true, true, true, false))
+                            {
+                                ItemManager.dropItem(new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, true), new Vector3(panPowder.Key.position.x, panPowder.Key.position.y + 2, panPowder.Key.position.z), false, true, false);
+                            }
                         }
                         BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panId), null, panPowder.Key.position, panPowder.Value.angle_x, panPowder.Value.angle_y, panPowder.Value.angle_z, panPowder.Value.owner, panPowder.Value.group);
 
