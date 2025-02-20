@@ -2,7 +2,7 @@
 {
     public class DrugeffectTimeObject
     {
-        public long time = SnowCookingPlugin.getCurrentTime();
+        public long time = SnowCookingPlugin.GetCurrentTime();
         public string playerId;
         public DrugeffectTimeObject(string playerId)
         {

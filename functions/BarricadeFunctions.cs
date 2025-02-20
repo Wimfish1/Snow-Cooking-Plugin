@@ -60,7 +60,7 @@ namespace Ocelot.SnowCooking.functions
         {
             if (barricadeTransform)
             {
-                BarricadeData bData = SnowCookingPlugin.Instance.getBarricadeDataAtPosition(barricadeTransform.position);
+                BarricadeData bData = SnowCookingPlugin.Instance.GetBarricadeDataAtPosition(barricadeTransform.position);
                 if (bData == null) return;
                 if (bData.barricade.health <= pendingTotalDamage)
                 {
@@ -247,6 +247,7 @@ namespace Ocelot.SnowCooking.functions
                         }
                     } catch (Exception ex)
                     {
+                        Logger.Log($"[ERROR] {ex}");
                         return;
                     }
                 });
@@ -266,6 +267,7 @@ namespace Ocelot.SnowCooking.functions
                         }
                     } catch (Exception ex)
                     {
+                        Logger.Log($"[ERROR] {ex}");
                         return;
                     }
                 });
@@ -286,6 +288,7 @@ namespace Ocelot.SnowCooking.functions
                     }
                     catch (Exception ex)
                     {
+                        Logger.Log($"[ERROR] {ex}");
                         return;
                     }
                     
@@ -308,6 +311,7 @@ namespace Ocelot.SnowCooking.functions
                     }
                     catch (Exception ex)
                     {
+                        Logger.Log($"[ERROR] {ex}");
                         return;
                     }
                     
@@ -329,6 +333,7 @@ namespace Ocelot.SnowCooking.functions
                     }
                     catch (Exception ex)
                     {
+                        Logger.Log($"[ERROR] {ex}");
                         return;
                     }
                     
@@ -350,6 +355,7 @@ namespace Ocelot.SnowCooking.functions
                     }
                     catch (Exception ex)
                     {
+                        Logger.Log($"[ERROR] {ex}");
                         return;
                     }
                     

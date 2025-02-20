@@ -9,7 +9,7 @@
         {
             this.progress = progress;
             this.isActive = isActive;
-            time = SnowCookingPlugin.getCurrentTime();
+            time = SnowCookingPlugin.GetCurrentTime();
         }
     }
 }

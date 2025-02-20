@@ -34,7 +34,9 @@ namespace Ocelot.SnowCooking
         protected override void Load()
         {
             Instance = this;
-            Logger.Log("SnowCookingPlugin v" + VERSION + " by Ocelot loaded! Enjoy! :)", ConsoleColor.Yellow);
+            Logger.Log("SnowCookingPlugin v" + VERSION + " loaded!", ConsoleColor.Yellow);
+            Logger.Log("Original Plugin By: Ocelot");
+            Logger.Log("Edited And Maintained By Wimfish1");
 
             BarricadeManager.onDeployBarricadeRequested += BarricadeDeployed;
             //UnturnedPlayerEvents.OnPlayerUpdateGesture += OnPlayerUpdateGesture;
@@ -55,16 +57,14 @@ namespace Ocelot.SnowCooking
             }
         }
 
-        private void OnGestureChanged(PlayerAnimator arg1, EPlayerGesture gesture)
+        public void OnGestureChanged(PlayerAnimator arg1, EPlayerGesture gesture)
         {
-            if (gesture == EPlayerGesture.PUNCH_LEFT || gesture == EPlayerGesture.PUNCH_RIGHT)
-            {
-                HeaterFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
-                PanFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
-            }
+            if (gesture != EPlayerGesture.PUNCH_LEFT && gesture != EPlayerGesture.PUNCH_RIGHT) return;
+            HeaterFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
+            PanFunctions.OnGestureChanged(UnturnedPlayer.FromPlayer(arg1.player), gesture);
         }
 
-        private void BarricadeDamaged(CSteamID instigatorSteamID, Transform barricadeTransform, ref ushort pendingTotalDamage, ref bool shouldAllow, EDamageOrigin damageOrigin)
+        public void BarricadeDamaged(CSteamID instigatorSteamID, Transform barricadeTransform, ref ushort pendingTotalDamage, ref bool shouldAllow, EDamageOrigin damageOrigin)
         {
             BarricadeFunctions.BarricadeDamaged(barricadeTransform, pendingTotalDamage);
         }
@@ -73,15 +73,13 @@ namespace Ocelot.SnowCooking
         {
             foreach (var heater in heaterList)
             {
-                if (heater.Key == sign.transform)
-                {
-                    shouldAllow = false;
-                    ChatManager.serverSendMessage(Translate("cocaine_sign_edit"), Color.white, null, UnturnedPlayer.FromCSteamID(instigator).SteamPlayer(), EChatMode.SAY, Configuration.Instance.iconImageUrl, true);
-                }
+                if (heater.Key != sign.transform) continue;
+                shouldAllow = false;
+                ChatManager.serverSendMessage(Translate("cocaine_sign_edit"), Color.white, null, UnturnedPlayer.FromCSteamID(instigator).SteamPlayer(), EChatMode.SAY, Configuration.Instance.iconImageUrl, true);
             }
         }
 
-        private void BarricadeSalvaged(CSteamID steamID, byte x, byte y, ushort plant, ushort index, ref bool shouldAllow)
+        public void BarricadeSalvaged(CSteamID steamID, byte x, byte y, ushort plant, ushort index, ref bool shouldAllow)
         {
             BarricadeFunctions.BarricadeSalvaged(steamID, x, y, plant, index);
         }
@@ -105,34 +103,25 @@ namespace Ocelot.SnowCooking
             }
         }
 
-        private void ConsumeAction(Player instigatingPlayer, ItemConsumeableAsset consumeableAsset)
+        public void ConsumeAction(Player instigatingPlayer, ItemConsumeableAsset consumeableAsset)
         {
             CocaineBagFunctions.ConsumeAction(instigatingPlayer, consumeableAsset);
         }
 
-        private void ButtonClick(Player player, string buttonName)
+        public void ButtonClick(Player player, string buttonName)
         {
             UiFunctions.ButtonClick(player, buttonName);
         }
 
-        //private void OnPlayerUpdateGesture(UnturnedPlayer player, UnturnedPlayerEvents.PlayerGesture gesture)
-        //{
-        //    if (gesture == UnturnedPlayerEvents.PlayerGesture.PunchLeft || gesture == UnturnedPlayerEvents.PlayerGesture.PunchRight)
-        //    {
-        //        HeaterFunctions.OnPlayerUpdateGesture(player, gesture);
-        //        PanFunctions.OnPlayerUpdateGesture(player, gesture);
-        //    }
-        //}
-
-        private void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, ref Vector3 point, ref float angle_x, ref float angle_y, ref float angle_z, ref ulong owner, ref ulong group, ref bool shouldAllow)
+        public void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, ref Vector3 point, ref float angle_x, ref float angle_y, ref float angle_z, ref ulong owner, ref ulong group, ref bool shouldAllow)
         {
-            Vector3 pos = point;
-            ulong ownerPan = owner;
-            ulong groupPan = group;
-            float angle_x_pan = angle_x;
-            float angle_y_pan = angle_y;
-            float angle_z_pan = angle_z;
-            BarricadeFunctions.BarricadeDeployed(barricade, asset, hit, pos, angle_x_pan, angle_y_pan, angle_z_pan, ownerPan, groupPan);
+            var pos = point;
+            var ownerPan = owner;
+            var groupPan = group;
+            var angleXPan = angle_x;
+            var angleYPan = angle_y;
+            var angleZPan = angle_z;
+            BarricadeFunctions.BarricadeDeployed(barricade, asset, hit, pos, angleXPan, angleYPan, angleZPan, ownerPan, groupPan);
         }
 
         
@@ -149,9 +138,9 @@ namespace Ocelot.SnowCooking
             Frame++;
             if (Frame % 5 != 0) return; // BRICHT METHODE AB WENN DER FRAME NICHT DURCH 5 TEILBAR IST
             // DO STUFF EVERY GAME FRAME E.G 60/s
-            if (getCurrentTime() - timer >= 1)
+            if (GetCurrentTime() - timer >= 1)
             {
-                timer = getCurrentTime();
+                timer = GetCurrentTime();
 
                 HeaterFunctions.Update();
                 PanFunctions.Update();
@@ -160,17 +149,14 @@ namespace Ocelot.SnowCooking
             }
         }
 
-        public Dictionary<Vector3, Transform> GetAllObjects()
+        private Dictionary<Vector3, Transform> GetAllObjects()
         {
             Dictionary<Vector3, Transform> objectsOnMap = new Dictionary<Vector3, Transform>();
             foreach (var region in BarricadeManager.regions)
             {
-                foreach (var drop in region.drops)
+                foreach (var drop in region.drops.Where(drop => !objectsOnMap.ContainsKey(drop.model.position)))
                 {
-                    if (!objectsOnMap.ContainsKey(drop.model.position))
-                    {
-                        objectsOnMap.Add(drop.model.position, drop.model);
-                    }
+                    objectsOnMap.Add(drop.model.position, drop.model);
                 }
             }
             return objectsOnMap;
@@ -178,7 +164,7 @@ namespace Ocelot.SnowCooking
 
         public Transform GetPlacedObjectTransform(Vector3 objectPosition)
         {
-            Dictionary<Vector3, Transform> objectsOnMap = new Dictionary<Vector3, Transform>();
+            Dictionary<Vector3, Transform> objectsOnMap;
             objectsOnMap = GetAllObjects();
 
             foreach (var mapObject in objectsOnMap.ToList())
@@ -199,11 +185,9 @@ namespace Ocelot.SnowCooking
             {
                 foreach (var drop in region.drops)
                 {
-                    if (!objectsOnMap.ContainsKey(drop.model.position))
-                    {
-                        InteractableSign sign = (InteractableSign)drop.interactable;
-                        objectsOnMap.Add(drop.model.position, sign);
-                    }
+                    if (objectsOnMap.ContainsKey(drop.model.position)) continue;
+                    var sign = (InteractableSign)drop.interactable;
+                    objectsOnMap.Add(drop.model.position, sign);
                 }
             }
             return objectsOnMap;
@@ -211,32 +195,35 @@ namespace Ocelot.SnowCooking
 
         public InteractableSign GetPlacedObjectSign(Vector3 objectPosition)
         {
-            Dictionary<Vector3, InteractableSign> objectsOnMap = new Dictionary<Vector3, InteractableSign>();
+            Dictionary<Vector3, InteractableSign> objectsOnMap;
             objectsOnMap = GetAllSigns();
 
-            foreach (var mapObject in objectsOnMap.ToList())
+            for (var index = 0; index < objectsOnMap.ToList().Count; index++)
             {
+                var mapObject = objectsOnMap.ToList()[index];
                 if (mapObject.Key == objectPosition)
                 {
                     return mapObject.Value;
                 }
             }
+
             return null; //Never happens
         }
 
-        public BarricadeData getBarricadeDataAtPosition(Vector3 position)
+        public BarricadeData GetBarricadeDataAtPosition(Vector3 position)
         {
             foreach (var region in BarricadeManager.regions)
             {
-                foreach (var b in region.barricades)
+                for (var index = 0; index < region.barricades.Count; index++)
                 {
+                    var b = region.barricades[index];
                     if (b.point == position) return b;
                 }
             }
             return null;
         }
 
-        public static Int32 getCurrentTime()
+        public static Int32 GetCurrentTime()
         {
             return (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
         }
@@ -245,7 +232,8 @@ namespace Ocelot.SnowCooking
         {
             StartCoroutine(_wait(seconds, action));
         }
-        IEnumerator _wait(float time, System.Action callback)
+
+        static IEnumerator _wait(float time, System.Action callback)
         {
             yield return new WaitForSeconds(time);
             callback();

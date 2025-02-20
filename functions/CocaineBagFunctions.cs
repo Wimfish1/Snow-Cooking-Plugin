@@ -29,7 +29,7 @@ namespace Ocelot.SnowCooking.functions
         {
             foreach (var drugeffect in SnowCookingPlugin.Instance.drugeffectPlayersList.ToList())
             {
-                if (SnowCookingPlugin.getCurrentTime() - drugeffect.time >= SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectDurationSecs)
+                if (SnowCookingPlugin.GetCurrentTime() - drugeffect.time >= SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectDurationSecs)
                 {
                     SnowCookingPlugin.Instance.drugeffectPlayersList.Remove(drugeffect);
                     UnturnedPlayer player = UnturnedPlayer.FromCSteamID(new CSteamID(ulong.Parse(drugeffect.playerId)));

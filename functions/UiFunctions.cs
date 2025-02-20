@@ -11,57 +11,67 @@ namespace Ocelot.SnowCooking.functions
         {
             if (player == null)
                 return;
-            UnturnedPlayer uplayer = UnturnedPlayer.FromPlayer(player);
-            if (buttonName == "cocaineplugin.exit")
+            var uplayer = UnturnedPlayer.FromPlayer(player);
+            switch (buttonName)
             {
-                if (uplayer == null)
+                case "cocaineplugin.exit" when uplayer == null:
                     return;
-                uplayer.Player.disablePluginWidgetFlag(EPluginWidgetFlags.Modal);
-                EffectManager.askEffectClearByID(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId, uplayer.CSteamID);
-                if (SnowCookingPlugin.Instance.heaterUiOpened.ContainsKey(uplayer.Id))
+                case "cocaineplugin.exit":
                 {
-                    SnowCookingPlugin.Instance.heaterUiOpened.Remove(uplayer.Id);
-                }
-            }
-            if (buttonName == "cocaineplugin.toggle")
-            {
-                foreach (var item in SnowCookingPlugin.Instance.heaterUiOpened.ToList())
-                {
-                    if (item.Key == null || uplayer == null)
-                        break;
-                    if (item.Key == uplayer.Id)
+                    uplayer.Player.disablePluginWidgetFlag(EPluginWidgetFlags.Modal);
+                    EffectManager.askEffectClearByID(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId, uplayer.CSteamID);
+                    if (SnowCookingPlugin.Instance.heaterUiOpened.ContainsKey(uplayer.Id))
                     {
-                        foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
+                        SnowCookingPlugin.Instance.heaterUiOpened.Remove(uplayer.Id);
+                    }
+
+                    break;
+                }
+                case "cocaineplugin.toggle":
+                {
+                    for (var index = 0; index < SnowCookingPlugin.Instance.heaterUiOpened.ToList().Count; index++)
+                    {
+                        var item = SnowCookingPlugin.Instance.heaterUiOpened.ToList()[index];
+                        if (item.Key == null || uplayer == null)
+                            break;
+                        if (item.Key != uplayer.Id) continue;
+                        for (var i = 0; i < SnowCookingPlugin.Instance.heaterList.ToList().Count; i++)
                         {
+                            var heater = SnowCookingPlugin.Instance.heaterList.ToList()[i];
                             if (heater.Key == null)
                                 break;
-                            foreach (var Generator in PowerTool.checkGenerators(heater.Key.position, PowerTool.MAX_POWER_RANGE, ushort.MaxValue))
+                            var list = PowerTool.checkGenerators(heater.Key.position,
+                                         PowerTool.MAX_POWER_RANGE, ushort.MaxValue);
+                            for (var index1 = 0; index1 < list.Count; index1++)
                             {
-                                if (Generator == null || heater.Key == null)
+                                var generator = list[index1];
+                                if (generator == null || heater.Key == null)
                                     break;
-                                if (Generator.fuel > 0 && Generator.isPowered && Generator.wirerange >= (heater.Key.position - Generator.transform.position).magnitude)
+                                if (generator.fuel <= 0 || !generator.isPowered || !(generator.wirerange >=
+                                        (heater.Key.position - generator.transform.position).magnitude)) continue;
+                                if (item.Key == null || heater.Key == null)
+                                    break;
+                                if (heater.Key.position != item.Value) continue;
+                                var status = "<color=green>ON</color>";
+                                if (heater.Value.isActive)
                                 {
-                                    if (item.Key == null || heater.Key == null)
-                                        break;
-                                    if (heater.Key.position == item.Value)
-                                    {
-                                        string status = "<color=green>ON</color>";
-                                        if (heater.Value.isActive)
-                                        {
-                                            status = "<color=red>OFF</color>";
-                                            heater.Value.isActive = false;
-                                        }
-                                        else
-                                        {
-                                            heater.Value.isActive = true;
-                                        }
-
-                                        EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), uplayer.CSteamID, false, "cocaineplugin.toggletext", status);
-                                    }
+                                    status = "<color=red>OFF</color>";
+                                    heater.Value.isActive = false;
                                 }
+                                else
+                                {
+                                    heater.Value.isActive = true;
+                                }
+
+                                EffectManager.sendUIEffectText(
+                                    Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance
+                                        .heaterUiId), uplayer.CSteamID, false, "cocaineplugin.toggletext",
+                                    status);
                             }
                         }
                     }
+
+                    break;
                 }
             }
         }

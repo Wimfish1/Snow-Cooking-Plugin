@@ -12,24 +12,27 @@ namespace Ocelot.SnowCooking.functions
     {
         public static void OnGestureChanged(UnturnedPlayer player, EPlayerGesture gesture)
         {
-            if (Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward, out RaycastHit raycastHit, 2, RayMasks.BARRICADE))
+            if (!Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward,
+                    out var raycastHit, 2, RayMasks.BARRICADE)) return;
+            var status = "<color=red>OFF</color>";
+            foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
             {
-                foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
+                if (heater.Key != raycastHit.transform) continue;
+                var progressBar = "";
+                if (heater.Value.isActive)
                 {
-                    if (heater.Key == raycastHit.transform)
+                    status = "<color=green>ON</color>";
+                }
+
+                switch ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
+                {
+                    //Sets the color of the progress bar
+                    case true:
+                        progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotColor + ">";
+                        break;
+                    default:
                     {
-                        string progressBar = "";
-                        string status = "<color=red>OFF</color>";
-                        if (heater.Value.isActive)
-                        {
-                            status = "<color=green>ON</color>";
-                        }
-                        //Sets the color of the progress bar
-                        if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
-                        {
-                            progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotColor + ">";
-                        }
-                        else if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
+                        if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
                         {
                             progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterHotColor + ">";
                         }
@@ -37,79 +40,34 @@ namespace Ocelot.SnowCooking.functions
                         {
                             progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterColdColor + ">";
                         }
-                        //Color end
-                        for (int i = 0; i < heater.Value.progress; i += 5)
-                        {
-                            progressBar += "█";
-                        }
-                        progressBar += "</color>";
-                        double prog = System.Math.Round((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress, 1);
-                        EffectManager.sendUIEffect(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId, Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), player.CSteamID, false, SnowCookingPlugin.Instance.Translate("temperature_title"), prog.ToString() + SnowCookingPlugin.Instance.Translate("temperature_symbol"), progressBar, status);
-                        player.Player.enablePluginWidgetFlag(EPluginWidgetFlags.Modal);
-                        if (SnowCookingPlugin.Instance.heaterUiOpened.ContainsKey(player.Id))
-                        {
-                            SnowCookingPlugin.Instance.heaterUiOpened.Remove(player.Id);
-                        }
-                        if (heater.Key == null)
-                            break;
-                        SnowCookingPlugin.Instance.heaterUiOpened.Add(player.Id, heater.Key.position);
+
+                        break;
                     }
                 }
+                //Color end
+                for (int i = 0; i < heater.Value.progress; i += 5)
+                {
+                    progressBar += "█";
+                }
+                progressBar += "</color>";
+                var prog = System.Math.Round((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress, 1);
+                EffectManager.sendUIEffect(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId, Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), player.CSteamID, false, SnowCookingPlugin.Instance.Translate("temperature_title"), prog.ToString() + SnowCookingPlugin.Instance.Translate("temperature_symbol"), progressBar, status);
+                player.Player.enablePluginWidgetFlag(EPluginWidgetFlags.Modal);
+                if (SnowCookingPlugin.Instance.heaterUiOpened.ContainsKey(player.Id))
+                {
+                    SnowCookingPlugin.Instance.heaterUiOpened.Remove(player.Id);
+                }
+                if (heater.Key == null)
+                    break;
+                SnowCookingPlugin.Instance.heaterUiOpened.Add(player.Id, heater.Key.position);
             }
         }
-        //public static void OnPlayerUpdateGesture(UnturnedPlayer player, UnturnedPlayerEvents.PlayerGesture gesture)
-        //{
-        //    if (Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward, out RaycastHit raycastHit, 2, RayMasks.BARRICADE))
-        //    {
-        //        foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
-        //        {
-        //            if (heater.Key == raycastHit.transform)
-        //            {
-        //                string progressBar = "";
-        //                string status = "<color=red>OFF</color>";
-        //                if (heater.Value.isActive)
-        //                {
-        //                    status = "<color=green>ON</color>";
-        //                }
-        //                //Sets the color of the progress bar
-        //                if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
-        //                {
-        //                    progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotColor + ">";
-        //                }
-        //                else if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
-        //                {
-        //                    progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterHotColor + ">";
-        //                }
-        //                else
-        //                {
-        //                    progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterColdColor + ">";
-        //                }
-        //                //Color end
-        //                for (int i = 0; i < heater.Value.progress; i += 5)
-        //                {
-        //                    progressBar += "█";
-        //                }
-        //                progressBar += "</color>";
-        //                double prog = System.Math.Round((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress, 1);
-        //                EffectManager.sendUIEffect(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId, Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), player.CSteamID, false, SnowCookingPlugin.Instance.Translate("temperature_title"), prog.ToString() + SnowCookingPlugin.Instance.Translate("temperature_symbol"), progressBar, status);
-        //                player.Player.enablePluginWidgetFlag(EPluginWidgetFlags.Modal);
-        //                if (SnowCookingPlugin.Instance.heaterUiOpened.ContainsKey(player.Id))
-        //                {
-        //                    SnowCookingPlugin.Instance.heaterUiOpened.Remove(player.Id);
-        //                }
-        //                if (heater.Key == null)
-        //                    break;
-        //                SnowCookingPlugin.Instance.heaterUiOpened.Add(player.Id, heater.Key.position);
-        //            }
-        //        }
-        //    }
-        //}
-        // ReSharper disable Unity.PerformanceAnalysis
+        
         public static void Update()
         {
-            double heatProg = SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / SnowCookingPlugin.Instance.Configuration.Instance.heatingDurationSecs;
+            var heatProg = SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / SnowCookingPlugin.Instance.Configuration.Instance.heatingDurationSecs;
 
-            double coolProg = SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / SnowCookingPlugin.Instance.Configuration.Instance.coolingDurationSecs;
+            var coolProg = SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / SnowCookingPlugin.Instance.Configuration.Instance.coolingDurationSecs;
 
             try
             {
@@ -117,7 +75,7 @@ namespace Ocelot.SnowCooking.functions
                 {
                     if (!heater.Key || heater.Value == null)
                         break;
-                    int amountActiveGenerators = 0;
+                    var amountActiveGenerators = 0;
                     foreach (var Generator in PowerTool.checkGenerators(heater.Key.position, PowerTool.MAX_POWER_RANGE, ushort.MaxValue).ToList())
                     {
                         if (!heater.Key || !Generator.transform)
@@ -134,20 +92,16 @@ namespace Ocelot.SnowCooking.functions
                         }
                     }
                     // new generator logic
-                    if (amountActiveGenerators == 0)
+                    if (amountActiveGenerators != 0) continue;
+                    if (heater.Value == null)
+                        break;
+                    if (!heater.Value.isActive) continue;
+                    heater.Value.isActive = false;
+                    foreach (var player in SnowCookingPlugin.Instance.heaterUiOpened.ToList())
                     {
-                        if (heater.Value == null)
-                            break;
-                        if (heater.Value.isActive)
+                        if (player.Value == heater.Key.position)
                         {
-                            heater.Value.isActive = false;
-                            foreach (var player in SnowCookingPlugin.Instance.heaterUiOpened.ToList())
-                            {
-                                if (player.Value == heater.Key.position)
-                                {
-                                    EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), new CSteamID(ulong.Parse(player.Key)), false, "cocaineplugin.toggletext", "<color=red>OFF</color>");
-                                }
-                            }
+                            EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), new CSteamID(ulong.Parse(player.Key)), false, "cocaineplugin.toggletext", "<color=red>OFF</color>");
                         }
                     }
                     //
@@ -164,22 +118,29 @@ namespace Ocelot.SnowCooking.functions
                 {
                     if (!heater.Key || heater.Value == null)
                         break;
-                    if (heater.Value.isActive)
+                    switch (heater.Value.isActive)
                     {
-                        if (heater.Value.progress < 100.0)
+                        case true:
                         {
-                            if (heater.Value.progress + heatProg > 100.0)
+                            if (heater.Value.progress < 100.0)
                             {
-                                heater.Value.progress = 100 - heatProg;
+                                if (heater.Value.progress + heatProg > 100.0)
+                                {
+                                    heater.Value.progress = 100 - heatProg;
+                                }
+                                heater.Value.progress += heatProg;
                             }
-                            heater.Value.progress += heatProg;
+
+                            break;
                         }
-                    }
-                    else if (!heater.Value.isActive)
-                    {
-                        if (heater.Value.progress > 0)
+                        case false:
                         {
-                            heater.Value.progress -= coolProg;
+                            if (heater.Value.progress > 0)
+                            {
+                                heater.Value.progress -= coolProg;
+                            }
+
+                            break;
                         }
                     }
                 }
@@ -199,31 +160,31 @@ namespace Ocelot.SnowCooking.functions
                     {
                         return;
                     }
-                    if (BarricadeManager.tryGetInfo(heater.Key, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region))
+
+                    if (!BarricadeManager.tryGetInfo(heater.Key, out byte x, out byte y, out ushort plant,
+                            out ushort index, out BarricadeRegion region)) continue;
+                    double prog = System.Math.Round((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress, 1);
+                    string text = "";
+                    if (prog >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
                     {
-                        double prog = System.Math.Round((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress, 1);
-                        string text = "";
-                        if (prog >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
-                        {
-                            text += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotColor + ">";
-                        }
-                        else if (prog >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
-                        {
-                            text += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterHotColor + ">";
-                        }
-                        else
-                        {
-                            text += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterColdColor + ">";
-                        }
-                        text += prog.ToString() + "</color>" + SnowCookingPlugin.Instance.Translate("temperature_symbol");
-                        //BarricadeManager.instance.channel.send("tellUpdateSign", ESteamCall.ALL, ESteamPacket.UPDATE_UNRELIABLE_BUFFER, x, y, plant, index, text);
-                        InteractableSign component = heater.Key.GetComponent<InteractableSign>();
-                        BarricadeManager.ServerSetSignText(component, text);
+                        text += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotColor + ">";
                     }
+                    else if (prog >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
+                    {
+                        text += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterHotColor + ">";
+                    }
+                    else
+                    {
+                        text += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterColdColor + ">";
+                    }
+                    text += prog.ToString() + "</color>" + SnowCookingPlugin.Instance.Translate("temperature_symbol");
+                    //BarricadeManager.instance.channel.send("tellUpdateSign", ESteamCall.ALL, ESteamPacket.UPDATE_UNRELIABLE_BUFFER, x, y, plant, index, text);
+                    InteractableSign component = heater.Key.GetComponent<InteractableSign>();
+                    BarricadeManager.ServerSetSignText(component, text);
                 }
             } catch (Exception ex)
             {
-                Logger.Log(String.Format("EXCEPTION THROWN | ExNo 3 (Error message: {0})", ex.Message), ConsoleColor.Red);
+                Logger.Log($"EXCEPTION THROWN | ExNo 3 (Error message: {ex.Message})", ConsoleColor.Red);
                 return;
             }
 
@@ -232,46 +193,44 @@ namespace Ocelot.SnowCooking.functions
                 {
                     if (player == null)
                         break;
-                    UnturnedPlayer uplayer = UnturnedPlayer.FromSteamPlayer(player);
+                    var uplayer = UnturnedPlayer.FromSteamPlayer(player);
                     foreach (var item in SnowCookingPlugin.Instance.heaterUiOpened.ToList())
                     {
                         foreach (var heater in SnowCookingPlugin.Instance.heaterList.ToList())
                         {
-                            if (heater.Key == null)
+                            if (!heater.Key)
                                 break;
-                            if (item.Value == heater.Key.position)
+                            if (item.Value != heater.Key.position) continue;
+                            string progressBar = "";
+                            //Sets the color of the progress bar
+                            if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
                             {
-                                string progressBar = "";
-                                //Sets the color of the progress bar
-                                if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotDegree)
-                                {
-                                    progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotColor + ">";
-                                }
-                                else if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
-                                {
-                                    progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterHotColor + ">";
-                                }
-                                else
-                                {
-                                    progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterColdColor + ">";
-                                }
-                                //Color end
-                                for (int i = 0; i < heater.Value.progress; i += 5)
-                                {
-                                    progressBar += "█";
-                                }
-                                progressBar += "</color>";
-                                double prog = System.Math.Round((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress, 1);
-                                if (prog > SnowCookingPlugin.Instance.Configuration.Instance.maxDegree)
-                                {
-                                    prog = SnowCookingPlugin.Instance.Configuration.Instance.maxDegree;
-                                } else if (prog < 0)
-                                {
-                                    prog = 0;
-                                }
-                                EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), uplayer.CSteamID, false, "cocaineplugin.tempprogress", progressBar);
-                                EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), uplayer.CSteamID, false, "cocaineplugin.tempdeg", prog.ToString() + SnowCookingPlugin.Instance.Translate("temperature_symbol"));
+                                progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterTooHotColor + ">";
                             }
+                            else if ((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress >= SnowCookingPlugin.Instance.Configuration.Instance.heaterHotDegree)
+                            {
+                                progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterHotColor + ">";
+                            }
+                            else
+                            {
+                                progressBar += "<color=" + SnowCookingPlugin.Instance.Configuration.Instance.heaterColdColor + ">";
+                            }
+                            //Color end
+                            for (int i = 0; i < heater.Value.progress; i += 5)
+                            {
+                                progressBar += "█";
+                            }
+                            progressBar += "</color>";
+                            double prog = System.Math.Round((SnowCookingPlugin.Instance.Configuration.Instance.maxDegree / 100.0) * heater.Value.progress, 1);
+                            if (prog > SnowCookingPlugin.Instance.Configuration.Instance.maxDegree)
+                            {
+                                prog = SnowCookingPlugin.Instance.Configuration.Instance.maxDegree;
+                            } else if (prog < 0)
+                            {
+                                prog = 0;
+                            }
+                            EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), uplayer.CSteamID, false, "cocaineplugin.tempprogress", progressBar);
+                            EffectManager.sendUIEffectText(Convert.ToInt16(SnowCookingPlugin.Instance.Configuration.Instance.heaterUiId), uplayer.CSteamID, false, "cocaineplugin.tempdeg", prog.ToString() + SnowCookingPlugin.Instance.Translate("temperature_symbol"));
                         }
                     }
                 }
