@@ -31,10 +31,13 @@ namespace Ocelot.SnowCooking.functions
                         double progressAdded = 100.0 / SnowCookingPlugin.Instance.Configuration.Instance.dryingDurationSecs;
                         panFilled.Value.progress += progressAdded;
                         if (!(panFilled.Value.progress >= 100)) continue;
-                        BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panPowderId), null, panFilled.Key.position, panFilled.Value.angle_x, panFilled.Value.angle_y, panFilled.Value.angle_z, panFilled.Value.owner, panFilled.Value.group);
+                        BarricadeManager.dropBarricade(
+                            new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panPowderId), null,
+                            panFilled.Key.position, panFilled.Value.angle_x, panFilled.Value.angle_y,
+                            panFilled.Value.angle_z, panFilled.Value.owner, panFilled.Value.group);
                         if (!panFilled.Key)
                             break;
-                        BarricadeManager.tryGetInfo(panFilled.Key, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
+                        BarricadeManager.tryGetInfo(panFilled.Key, out var x, out var y, out var plant, out var index, out var region);
                         if (index < region.barricades.Count)
                         {
                             BarricadeManager.destroyBarricade(region, x, y, plant, index);

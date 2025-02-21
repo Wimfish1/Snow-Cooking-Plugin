@@ -22,15 +22,27 @@ namespace Ocelot.SnowCooking.functions
                         var item = new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, EItemOrigin.ADMIN);
                         if (!player.Inventory.tryAddItemAuto(item, true, true, true, false))
                         {
-                            ItemManager.dropItem(new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, true), new Vector3(panPowder.Key.position.x, panPowder.Key.position.y + 2, panPowder.Key.position.z), false, true, false);
+                            ItemManager.dropItem(
+                                new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, true),
+                                new Vector3(panPowder.Key.position.x, panPowder.Key.position.y + 2,
+                                    panPowder.Key.position.z), false, true, false);
                         }
                     }
                     else
                     {
-                        ItemManager.dropItem(new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId, true), new Vector3(panPowder.Key.position.x, panPowder.Key.position.y + 2, panPowder.Key.position.z), false, true, false);
+                        ItemManager.dropItem(new Item(SnowCookingPlugin.Instance.Configuration.Instance.snowBagId,
+                                true),
+                            new Vector3(panPowder.Key.position.x,
+                                panPowder.Key.position.y + 2,
+                                panPowder.Key.position.z),
+                            false,
+                            true,
+                            false);
                     }
                 }
-                BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panId), null, panPowder.Key.position, panPowder.Value.angle_x, panPowder.Value.angle_y, panPowder.Value.angle_z, panPowder.Value.owner, panPowder.Value.group);
+                BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panId),
+                    null, panPowder.Key.position, panPowder.Value.angle_x, panPowder.Value.angle_y,
+                    panPowder.Value.angle_z, panPowder.Value.owner, panPowder.Value.group);
 
                 BarricadeManager.tryGetInfo(panPowder.Key, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
                 BarricadeManager.destroyBarricade(region, x, y, plant, index);
@@ -72,7 +84,9 @@ namespace Ocelot.SnowCooking.functions
                         {
                             if (!cocaLeaves)
                                 break;
-                            var ashes = BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.ashesId), null, cocaLeaves.position, 0, 0, 0, pan.Value.owner, pan.Value.group);
+                            var ashes = BarricadeManager.dropBarricade(
+                                new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.ashesId), null,
+                                cocaLeaves.position, 0, 0, 0, pan.Value.owner, pan.Value.group);
 
                             BarricadeManager.tryGetInfo(cocaLeaves, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
                             BarricadeManager.destroyBarricade(region, x, y, plant, index);
@@ -88,7 +102,7 @@ namespace Ocelot.SnowCooking.functions
                             //coca leaves stuff
                             if (!cocaLeaves)
                                 break;
-                            BarricadeManager.tryGetInfo(cocaLeaves, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
+                            BarricadeManager.tryGetInfo(cocaLeaves, out var x, out var y, out var plant, out var index, out var region);
                             BarricadeManager.destroyBarricade(region, x, y, plant, index);
                             if (!cocaLeaves)
                                 break;
@@ -97,8 +111,12 @@ namespace Ocelot.SnowCooking.functions
                             //pan stuff
                             if (!pan.Key)
                                 break;
-                            BarricadeManager.tryGetInfo(pan.Key, out var xpan, out var ypan, out var plantpan, out var indexpan, out var regionpan);
-                            BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panFilledId), null, pan.Key.position, pan.Value.angle_x, pan.Value.angle_y, pan.Value.angle_z, pan.Value.owner, pan.Value.group);
+                            BarricadeManager.tryGetInfo(pan.Key, out var xpan, out var ypan, out var plantpan,
+                                out var indexpan, out var regionpan);
+                            BarricadeManager.dropBarricade(
+                                new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panFilledId), null,
+                                pan.Key.position, pan.Value.angle_x, pan.Value.angle_y, pan.Value.angle_z,
+                                pan.Value.owner, pan.Value.group);
                             BarricadeManager.destroyBarricade(regionpan, xpan, ypan, plantpan, indexpan);
                             if (!pan.Key)
                                 break;

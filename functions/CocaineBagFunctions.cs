@@ -10,7 +10,7 @@ namespace Ocelot.SnowCooking.functions
     {
         public static void ConsumeAction(Player instigatingPlayer, ItemConsumeableAsset consumeableAsset)
         {
-            UnturnedPlayer player = UnturnedPlayer.FromPlayer(instigatingPlayer);
+            var player = UnturnedPlayer.FromPlayer(instigatingPlayer);
             if (consumeableAsset.id != SnowCookingPlugin.Instance.Configuration.Instance.snowBagId) return;
             SnowCookingPlugin.Instance.drugeffectPlayersList.Add(new DrugeffectTimeObject(player.Id));
             if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
@@ -30,7 +30,7 @@ namespace Ocelot.SnowCooking.functions
                 if (SnowCookingPlugin.GetCurrentTime() - drugeffect.time <
                     SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectDurationSecs) continue;
                 SnowCookingPlugin.Instance.drugeffectPlayersList.Remove(drugeffect);
-                UnturnedPlayer player = UnturnedPlayer.FromCSteamID(new CSteamID(ulong.Parse(drugeffect.playerId)));
+                var player = UnturnedPlayer.FromCSteamID(new CSteamID(ulong.Parse(drugeffect.playerId)));
                 if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
                 {
                     player.Player.movement.sendPluginSpeedMultiplier(1);

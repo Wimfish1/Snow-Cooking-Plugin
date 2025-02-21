@@ -123,7 +123,8 @@ namespace Ocelot.SnowCooking.functions
                         break;
 
                     if (item.Key.position != bDrop.model.position) continue;
-                    BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    BarricadeManager.tryGetInfo(bDrop.model, out var xBarricade, out var yBarricade,
+                        out var plantBarricade, out var indexBarricade, out var regionBarricade);
                     if (x != xBarricade || y != yBarricade || plant != plantBarricade || index != indexBarricade)
                         continue;
                     if (bDrop.model != null)
@@ -138,7 +139,8 @@ namespace Ocelot.SnowCooking.functions
                         break;
 
                     if (item.Key.position != bDrop.model.position) continue;
-                    BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    BarricadeManager.tryGetInfo(bDrop.model, out var xBarricade, out var yBarricade,
+                        out var plantBarricade, out var indexBarricade, out var regionBarricade);
                     if (x != xBarricade || y != yBarricade || plant != plantBarricade ||
                         index != indexBarricade) continue;
                     if (bDrop.model != null)
@@ -153,7 +155,8 @@ namespace Ocelot.SnowCooking.functions
                         break;
 
                     if (item.Key.position != bDrop.model.position) continue;
-                    BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    BarricadeManager.tryGetInfo(bDrop.model, out var xBarricade, out var yBarricade,
+                        out var plantBarricade, out var indexBarricade, out var regionBarricade);
                     if (x != xBarricade || y != yBarricade || plant != plantBarricade || index != indexBarricade)
                         continue;
                     if (bDrop.model != null)
@@ -168,7 +171,8 @@ namespace Ocelot.SnowCooking.functions
                         break;
 
                     if (item.Key.position != bDrop.model.position) continue;
-                    BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    BarricadeManager.tryGetInfo(bDrop.model, out var xBarricade, out var yBarricade,
+                        out var plantBarricade, out var indexBarricade, out var regionBarricade);
                     if (x != xBarricade || y != yBarricade || plant != plantBarricade ||
                         index != indexBarricade) continue;
                     if (bDrop.model != null)
@@ -183,7 +187,8 @@ namespace Ocelot.SnowCooking.functions
                         break;
 
                     if (item.position != bDrop.model.position) continue;
-                    BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    BarricadeManager.tryGetInfo(bDrop.model, out var xBarricade, out var yBarricade,
+                        out var plantBarricade, out var indexBarricade, out var regionBarricade);
                     if (x != xBarricade || y != yBarricade || plant != plantBarricade ||
                         index != indexBarricade) continue;
                     if (bDrop.model != null)
@@ -198,7 +203,8 @@ namespace Ocelot.SnowCooking.functions
                         break;
 
                     if (item.position != bDrop.model.position) continue;
-                    BarricadeManager.tryGetInfo(bDrop.model, out byte xBarricade, out byte yBarricade, out ushort plantBarricade, out ushort indexBarricade, out BarricadeRegion regionBarricade);
+                    BarricadeManager.tryGetInfo(bDrop.model, out var xBarricade, out var yBarricade,
+                        out var plantBarricade, out var indexBarricade, out var regionBarricade);
                     if (x != xBarricade || y != yBarricade || plant != plantBarricade ||
                         index != indexBarricade) continue;
                     if (bDrop.model != null)
@@ -206,7 +212,8 @@ namespace Ocelot.SnowCooking.functions
                 }
             }
         }
-        public static void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, Vector3 pos, float angle_x, float angle_y, float angle_z, ulong owner, ulong group)
+        public static void BarricadeDeployed(Barricade barricade, ItemBarricadeAsset asset, Transform hit, Vector3 pos,
+            float angleX, float angleY, float angleZ, ulong owner, ulong group)
         {
             if (barricade == null)
                 return;
@@ -214,7 +221,7 @@ namespace Ocelot.SnowCooking.functions
             {
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
-                    Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
+                    var barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
                     if (!barricadeTransform) return;
                     try
                     {
@@ -234,13 +241,13 @@ namespace Ocelot.SnowCooking.functions
             {
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
-                    Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
+                    var barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
                     if (!barricadeTransform) return;
                     try
                     {
                         if (!SnowCookingPlugin.Instance.panList.ContainsKey(barricadeTransform))
                         {
-                            SnowCookingPlugin.Instance.panList.Add(barricadeTransform, new PanObject(0, angle_x, angle_y, angle_z, owner, group));
+                            SnowCookingPlugin.Instance.panList.Add(barricadeTransform, new PanObject(0, angleX, angleY, angleZ, owner, group));
                         }
                     } catch (Exception ex)
                     {
@@ -254,7 +261,7 @@ namespace Ocelot.SnowCooking.functions
             {
                 SnowCookingPlugin.Instance.Wait(0.4f, () =>
                 {
-                    Transform barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
+                    var barricadeTransform = SnowCookingPlugin.Instance.GetPlacedObjectTransform(pos);
                     if (!barricadeTransform) return;
                     try
                     {
@@ -283,7 +290,7 @@ namespace Ocelot.SnowCooking.functions
                     {
                         if (!SnowCookingPlugin.Instance.panFilledList.ContainsKey(barricadeTransform))
                         {
-                            SnowCookingPlugin.Instance.panFilledList.Add(barricadeTransform, new PanFilledObject(0, angle_x, angle_y, angle_z, owner, group));
+                            SnowCookingPlugin.Instance.panFilledList.Add(barricadeTransform, new PanFilledObject(0, angleX, angleY, angleZ, owner, group));
                         }
                     }
                     catch (Exception ex)
@@ -327,7 +334,7 @@ namespace Ocelot.SnowCooking.functions
                     {
                         if (!SnowCookingPlugin.Instance.panPowderList.ContainsKey(barricadeTransform))
                         {
-                            SnowCookingPlugin.Instance.panPowderList.Add(barricadeTransform, new PanPowderObject(angle_x, angle_y, angle_z, owner, group));
+                            SnowCookingPlugin.Instance.panPowderList.Add(barricadeTransform, new PanPowderObject(angleX, angleY, angleZ, owner, group));
                         }
                     }
                     catch (Exception ex)
