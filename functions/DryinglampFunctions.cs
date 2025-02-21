@@ -30,20 +30,18 @@ namespace Ocelot.SnowCooking.functions
                         if (lamp != raycastHit.transform) continue;
                         double progressAdded = 100.0 / SnowCookingPlugin.Instance.Configuration.Instance.dryingDurationSecs;
                         panFilled.Value.progress += progressAdded;
-                        if (panFilled.Value.progress >= 100)
+                        if (!(panFilled.Value.progress >= 100)) continue;
+                        BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panPowderId), null, panFilled.Key.position, panFilled.Value.angle_x, panFilled.Value.angle_y, panFilled.Value.angle_z, panFilled.Value.owner, panFilled.Value.group);
+                        if (!panFilled.Key)
+                            break;
+                        BarricadeManager.tryGetInfo(panFilled.Key, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
+                        if (index < region.barricades.Count)
                         {
-                            BarricadeManager.dropBarricade(new Barricade(SnowCookingPlugin.Instance.Configuration.Instance.panPowderId), null, panFilled.Key.position, panFilled.Value.angle_x, panFilled.Value.angle_y, panFilled.Value.angle_z, panFilled.Value.owner, panFilled.Value.group);
-                            if (!panFilled.Key)
-                                break;
-                            BarricadeManager.tryGetInfo(panFilled.Key, out byte x, out byte y, out ushort plant, out ushort index, out BarricadeRegion region);
-                            if (index < region.barricades.Count)
-                            {
-                                BarricadeManager.destroyBarricade(region, x, y, plant, index);
-                            }
-                            if (!panFilled.Key)
-                                break;
-                            SnowCookingPlugin.Instance.panFilledList.Remove(panFilled.Key);
+                            BarricadeManager.destroyBarricade(region, x, y, plant, index);
                         }
+                        if (!panFilled.Key)
+                            break;
+                        SnowCookingPlugin.Instance.panFilledList.Remove(panFilled.Key);
                     }
                 }
             }

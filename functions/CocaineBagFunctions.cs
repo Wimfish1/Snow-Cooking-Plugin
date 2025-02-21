@@ -11,17 +11,15 @@ namespace Ocelot.SnowCooking.functions
         public static void ConsumeAction(Player instigatingPlayer, ItemConsumeableAsset consumeableAsset)
         {
             UnturnedPlayer player = UnturnedPlayer.FromPlayer(instigatingPlayer);
-            if (consumeableAsset.id == SnowCookingPlugin.Instance.Configuration.Instance.snowBagId)
+            if (consumeableAsset.id != SnowCookingPlugin.Instance.Configuration.Instance.snowBagId) return;
+            SnowCookingPlugin.Instance.drugeffectPlayersList.Add(new DrugeffectTimeObject(player.Id));
+            if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
             {
-                SnowCookingPlugin.Instance.drugeffectPlayersList.Add(new DrugeffectTimeObject(player.Id));
-                if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
-                {
-                    player.Player.movement.sendPluginSpeedMultiplier(SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectSpeedMultiplier);
-                }
-                if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectJump)
-                {
-                    player.Player.movement.sendPluginJumpMultiplier(SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectJumpMultiplier);
-                }
+                player.Player.movement.sendPluginSpeedMultiplier(SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectSpeedMultiplier);
+            }
+            if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectJump)
+            {
+                player.Player.movement.sendPluginJumpMultiplier(SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectJumpMultiplier);
             }
         }
 
@@ -29,18 +27,17 @@ namespace Ocelot.SnowCooking.functions
         {
             foreach (var drugeffect in SnowCookingPlugin.Instance.drugeffectPlayersList.ToList())
             {
-                if (SnowCookingPlugin.GetCurrentTime() - drugeffect.time >= SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectDurationSecs)
+                if (SnowCookingPlugin.GetCurrentTime() - drugeffect.time <
+                    SnowCookingPlugin.Instance.Configuration.Instance.DrugEffectDurationSecs) continue;
+                SnowCookingPlugin.Instance.drugeffectPlayersList.Remove(drugeffect);
+                UnturnedPlayer player = UnturnedPlayer.FromCSteamID(new CSteamID(ulong.Parse(drugeffect.playerId)));
+                if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
                 {
-                    SnowCookingPlugin.Instance.drugeffectPlayersList.Remove(drugeffect);
-                    UnturnedPlayer player = UnturnedPlayer.FromCSteamID(new CSteamID(ulong.Parse(drugeffect.playerId)));
-                    if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectSpeed)
-                    {
-                        player.Player.movement.sendPluginSpeedMultiplier(1);
-                    }
-                    if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectJump)
-                    {
-                        player.Player.movement.sendPluginJumpMultiplier(1);
-                    }
+                    player.Player.movement.sendPluginSpeedMultiplier(1);
+                }
+                if (SnowCookingPlugin.Instance.Configuration.Instance.UseDrugEffectJump)
+                {
+                    player.Player.movement.sendPluginJumpMultiplier(1);
                 }
             }
         }

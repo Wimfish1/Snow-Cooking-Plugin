@@ -42,9 +42,8 @@ namespace Ocelot.SnowCooking.functions
                                 break;
                             var list = PowerTool.checkGenerators(heater.Key.position,
                                          PowerTool.MAX_POWER_RANGE, ushort.MaxValue);
-                            for (var index1 = 0; index1 < list.Count; index1++)
+                            foreach (var generator in list)
                             {
-                                var generator = list[index1];
                                 if (generator == null || heater.Key == null)
                                     break;
                                 if (generator.fuel <= 0 || !generator.isPowered || !(generator.wirerange >=

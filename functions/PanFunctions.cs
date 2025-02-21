@@ -12,7 +12,7 @@ namespace Ocelot.SnowCooking.functions
             foreach (var panPowder in SnowCookingPlugin.Instance.panPowderList.ToList())
             {
                 if (!Physics.Raycast(player.Player.look.aim.position, player.Player.look.aim.forward,
-                        out RaycastHit raycastHit, 2, RayMasks.BARRICADE)) continue;
+                        out var raycastHit, 2, RayMasks.BARRICADE)) continue;
                 if (raycastHit.transform != panPowder.Key) continue;
                 var amountBags = Random.Range(SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMin, SnowCookingPlugin.Instance.Configuration.Instance.snowBagsMax);
                 for (var i = 0; i < amountBags; i++)

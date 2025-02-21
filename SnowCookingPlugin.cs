@@ -36,7 +36,7 @@ namespace Ocelot.SnowCooking
             Instance = this;
             Logger.Log("SnowCookingPlugin v" + VERSION + " loaded!", ConsoleColor.Yellow);
             Logger.Log("Original Plugin By: Ocelot");
-            Logger.Log("Edited And Maintained By Wimfish1");
+            Logger.Log("Edited And Maintained By Wimfish1 :-)");
 
             BarricadeManager.onDeployBarricadeRequested += BarricadeDeployed;
             //UnturnedPlayerEvents.OnPlayerUpdateGesture += OnPlayerUpdateGesture;
@@ -86,8 +86,7 @@ namespace Ocelot.SnowCooking
 
         protected override void Unload()
         {
-            BarricadeManager.onDeployBarricadeRequested -= BarricadeDeployed;
-            //UnturnedPlayerEvents.OnPlayerUpdateGesture -= OnPlayerUpdateGesture;
+            BarricadeManager.onDeployBarricadeRequested -= BarricadeDeployed; 
             PlayerAnimator.OnGestureChanged_Global -= OnGestureChanged;
             EffectManager.onEffectButtonClicked -= ButtonClick;
             UseableConsumeable.onConsumePerformed -= ConsumeAction;
@@ -167,13 +166,15 @@ namespace Ocelot.SnowCooking
             Dictionary<Vector3, Transform> objectsOnMap;
             objectsOnMap = GetAllObjects();
 
-            foreach (var mapObject in objectsOnMap.ToList())
+            for (var index = 0; index < objectsOnMap.ToList().Count; index++)
             {
+                var mapObject = objectsOnMap.ToList()[index];
                 if (mapObject.Key == objectPosition)
                 {
                     return mapObject.Value;
                 }
             }
+
             return null; //Never happens
         }
 
