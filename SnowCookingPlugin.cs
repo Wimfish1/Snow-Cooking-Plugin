@@ -9,8 +9,10 @@ using Steamworks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using UnityEngine;
+using Environment = System.Environment;
 using Logger = Rocket.Core.Logging.Logger;
 
 namespace Ocelot.SnowCooking
@@ -39,7 +41,6 @@ namespace Ocelot.SnowCooking
             Logger.Log("Edited And Maintained By Wimfish1 :-)");
 
             BarricadeManager.onDeployBarricadeRequested += BarricadeDeployed;
-            //UnturnedPlayerEvents.OnPlayerUpdateGesture += OnPlayerUpdateGesture;
             PlayerAnimator.OnGestureChanged_Global += OnGestureChanged;
             EffectManager.onEffectButtonClicked += ButtonClick;
             UseableConsumeable.onConsumePerformed += ConsumeAction;
@@ -47,16 +48,62 @@ namespace Ocelot.SnowCooking
             BarricadeManager.onDamageBarricadeRequested += BarricadeDamaged;
             U.Events.OnPlayerDisconnected += PlayerDisconnected;
             BarricadeManager.onModifySignRequested += OnModifySign;
+
             if (Level.isLoaded)
             {
-                BarricadeFunctions.AddExistingBarricades(1);
+                AddExistingBarricades(1);
             }
             else
             {
-                Level.onLevelLoaded += BarricadeFunctions.AddExistingBarricades;
+                Level.onLevelLoaded += AddExistingBarricades;
             }
         }
 
+        
+        private void AddExistingBarricades(int level)
+        {
+            Logger.Log("Adding map Barricades to list...", ConsoleColor.Green);
+
+            foreach (var region in BarricadeManager.regions)
+            {
+                foreach (var drop in region.drops)
+                {
+                    if (drop.asset.id != Configuration.Instance.dryingLampId) continue; // Only process drying lamps
+                    var barricade = region.findBarricadeByInstanceID(drop.instanceID);
+
+                    if (barricade == null) continue;
+
+                    Transform barricadeTransform = null;
+
+                    try
+                    {
+                        barricadeTransform = GetPlacedObjectTransform(barricade.point);
+
+                        if (barricadeTransform != null)
+                        {
+                            if (!dryingLampList.Contains(barricadeTransform))
+                            {
+                                dryingLampList.Add(barricadeTransform);
+                            }
+                            else
+                            {
+                                Logger.Log("Duplicated entry detected, skipping object. (No need to worry)", ConsoleColor.Yellow);
+                            }
+                        }
+                        else
+                        {
+                            Logger.Log($"Could not find transform for barricade at {barricade.point}.", ConsoleColor.Red);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Log($"Error getting transform for barricade at {barricade.point}: {ex.Message}", ConsoleColor.Red);
+                    }
+                }
+            }
+            Logger.Log("All barricades added.", ConsoleColor.Green);
+        }
+        
         public void OnGestureChanged(PlayerAnimator arg1, EPlayerGesture gesture)
         {
             if (gesture != EPlayerGesture.PUNCH_LEFT && gesture != EPlayerGesture.PUNCH_RIGHT) return;
@@ -136,7 +183,6 @@ namespace Ocelot.SnowCooking
         {
             Frame++;
             if (Frame % 5 != 0) return; // BRICHT METHODE AB WENN DER FRAME NICHT DURCH 5 TEILBAR IST
-            // DO STUFF EVERY GAME FRAME E.G 60/s
             if (GetCurrentTime() - timer >= 1)
             {
                 timer = GetCurrentTime();
@@ -148,35 +194,37 @@ namespace Ocelot.SnowCooking
             }
         }
 
-        private Dictionary<Vector3, Transform> GetAllObjects()
+        private static Dictionary<Vector3, Transform> GetAllObjects()
         {
-            Dictionary<Vector3, Transform> objectsOnMap = new Dictionary<Vector3, Transform>();
+            var objectsOnMap = new Dictionary<Vector3, Transform>();
             foreach (var region in BarricadeManager.regions)
             {
-                foreach (var drop in region.drops.Where(drop => !objectsOnMap.ContainsKey(drop.model.position)))
+                foreach (var drop in region.drops)
                 {
-                    objectsOnMap.Add(drop.model.position, drop.model);
+                    if (!objectsOnMap.ContainsKey(drop.model.position))
+                    {
+                        objectsOnMap.Add(drop.model.position, drop.model);
+                    }
                 }
             }
             return objectsOnMap;
         }
-
+        
         public Transform GetPlacedObjectTransform(Vector3 objectPosition)
         {
-            Dictionary<Vector3, Transform> objectsOnMap;
-            objectsOnMap = GetAllObjects();
+            Dictionary<Vector3, Transform> objectsOnMap = GetAllObjects();
+            float tolerance = 0.2f;
 
-            for (var index = 0; index < objectsOnMap.ToList().Count; index++)
+            foreach (var mapObject in objectsOnMap.ToList())
             {
-                var mapObject = objectsOnMap.ToList()[index];
-                if (mapObject.Key == objectPosition)
+                if (Vector3.Distance(mapObject.Key, objectPosition) < tolerance)
                 {
                     return mapObject.Value;
                 }
             }
-
-            return null; //Never happens
+            return null;
         }
+
 
         //FOR SIGN
         public Dictionary<Vector3, InteractableSign> GetAllSigns()
@@ -238,6 +286,17 @@ namespace Ocelot.SnowCooking
         {
             yield return new WaitForSeconds(time);
             callback();
+        }
+
+        private bool runOnce = false; 
+        
+        private void RunOnce(int level){
+            if(runOnce == false){
+                BarricadeFunctions.AddExistingBarricades(level);
+                runOnce = true;
+            } else {
+                Level.onLevelLoaded -= RunOnce;
+            }
         }
     }
 }
